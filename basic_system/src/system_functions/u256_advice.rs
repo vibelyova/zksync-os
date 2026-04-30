@@ -1,20 +1,29 @@
 use u256::U256;
 use zk_ee::oracle::query_ids::{U256_DIV_REM_ADVICE_QUERY_ID, U256_MULMOD_ADVICE_QUERY_ID};
-use zk_ee::oracle::usize_serialization::UsizeDeserializable;
 use zk_ee::oracle::IOOracle;
 #[cfg(target_pointer_width = "32")]
 use zk_ee::utils::u256_arithmetic_advice::{U256DivRemAdviceParams, U256MulmodAdviceParams};
 #[cfg(target_pointer_width = "64")]
 use zk_ee::utils::u256_arithmetic_advice::{U256DivRemAdviceParams64, U256MulmodAdviceParams64};
 
+/// Read a u64 limb from the oracle response iterator.
+#[cfg(target_pointer_width = "32")]
 #[inline(always)]
-fn read_limbs_from_oracle_response(it: &mut impl ExactSizeIterator<Item = usize>) -> [u64; 4] {
-    [
-        <u64 as UsizeDeserializable>::from_iter(it).expect("u256 limb 0"),
-        <u64 as UsizeDeserializable>::from_iter(it).expect("u256 limb 1"),
-        <u64 as UsizeDeserializable>::from_iter(it).expect("u256 limb 2"),
-        <u64 as UsizeDeserializable>::from_iter(it).expect("u256 limb 3"),
-    ]
+fn read_u64(it: &mut impl ExactSizeIterator<Item = usize>) -> u64 {
+    let lo = it.next().unwrap() as u64;
+    let hi = it.next().unwrap() as u64;
+    lo | (hi << 32)
+}
+
+#[cfg(target_pointer_width = "64")]
+#[inline(always)]
+fn read_u64(it: &mut impl ExactSizeIterator<Item = usize>) -> u64 {
+    it.next().unwrap() as u64
+}
+
+#[inline(always)]
+fn read_limbs(it: &mut impl ExactSizeIterator<Item = usize>) -> [u64; 4] {
+    [read_u64(it), read_u64(it), read_u64(it), read_u64(it)]
 }
 
 #[inline]
@@ -53,8 +62,8 @@ pub fn u256_div_rem_with_advice<O: IOOracle>(
             .expect("div_rem oracle query failed")
     };
 
-    let q_limbs = read_limbs_from_oracle_response(&mut it);
-    let r_limbs = read_limbs_from_oracle_response(&mut it);
+    let q_limbs = read_limbs(&mut it);
+    let r_limbs = read_limbs(&mut it);
 
     let mut check_lo = U256::from_limbs(q_limbs);
     let mut check_hi = U256::from_limbs(q_limbs);
@@ -116,9 +125,9 @@ pub fn u256_mulmod_with_advice<O: IOOracle>(
             .expect("mulmod oracle query failed")
     };
 
-    let q_lo_limbs = read_limbs_from_oracle_response(&mut it);
-    let q_hi_limbs = read_limbs_from_oracle_response(&mut it);
-    let r_limbs = read_limbs_from_oracle_response(&mut it);
+    let q_lo_limbs = read_limbs(&mut it);
+    let q_hi_limbs = read_limbs(&mut it);
+    let r_limbs = read_limbs(&mut it);
 
     let mut p0_lo = U256::from_limbs(q_lo_limbs);
     let mut p0_hi = U256::from_limbs(q_lo_limbs);
