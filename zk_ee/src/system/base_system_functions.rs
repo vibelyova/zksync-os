@@ -421,13 +421,37 @@ pub trait SystemFunctionsExt<R: Resources> {
         Self::ModExp::execute(input, output, resources, oracle, logger, allocator)
     }
 
+    type U256DivRem: U256DivRemExt;
+    type U256Mulmod: U256MulmodExt;
+
     fn u256_div_rem<O: IOOracle>(
         dividend_or_quotient: &mut u256::U256,
         divisor_or_remainder: &mut u256::U256,
         oracle: &mut O,
-    );
+    ) {
+        Self::U256DivRem::execute(dividend_or_quotient, divisor_or_remainder, oracle)
+    }
 
     fn u256_mulmod<O: IOOracle>(
+        a: &mut u256::U256,
+        b: &mut u256::U256,
+        modulus_or_result: &mut u256::U256,
+        oracle: &mut O,
+    ) {
+        Self::U256Mulmod::execute(a, b, modulus_or_result, oracle)
+    }
+}
+
+pub trait U256DivRemExt {
+    fn execute<O: IOOracle>(
+        dividend_or_quotient: &mut u256::U256,
+        divisor_or_remainder: &mut u256::U256,
+        oracle: &mut O,
+    );
+}
+
+pub trait U256MulmodExt {
+    fn execute<O: IOOracle>(
         a: &mut u256::U256,
         b: &mut u256::U256,
         modulus_or_result: &mut u256::U256,
