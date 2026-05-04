@@ -2,16 +2,16 @@ use u256::U256;
 use zk_ee::oracle::query_ids::{U256_DIV_REM_ADVICE_QUERY_ID, U256_MULMOD_ADVICE_QUERY_ID};
 use zk_ee::oracle::usize_serialization::UsizeDeserializable;
 use zk_ee::oracle::IOOracle;
-use zk_ee::system::base_system_functions::{U256DivRemExt, U256MulmodExt};
+use zk_ee::system::base_system_functions::{DivRemExt, MulmodExt};
 #[cfg(target_pointer_width = "32")]
 use zk_ee::utils::u256_arithmetic_advice::{U256DivRemAdviceParams, U256MulmodAdviceParams};
 #[cfg(target_pointer_width = "64")]
 use zk_ee::utils::u256_arithmetic_advice::{U256DivRemAdviceParams64, U256MulmodAdviceParams64};
 
-pub struct U256DivRemImpl<const USE_ADVICE: bool>;
-pub struct U256MulmodImpl<const USE_ADVICE: bool>;
+pub struct DivRemImpl<const USE_ADVICE: bool>;
+pub struct MulmodImpl<const USE_ADVICE: bool>;
 
-impl<const USE_ADVICE: bool> U256DivRemExt for U256DivRemImpl<USE_ADVICE> {
+impl<const USE_ADVICE: bool> DivRemExt for DivRemImpl<USE_ADVICE> {
     fn execute<O: IOOracle>(
         dividend_or_quotient: &mut U256,
         divisor_or_remainder: &mut U256,
@@ -25,7 +25,7 @@ impl<const USE_ADVICE: bool> U256DivRemExt for U256DivRemImpl<USE_ADVICE> {
     }
 }
 
-impl<const USE_ADVICE: bool> U256MulmodExt for U256MulmodImpl<USE_ADVICE> {
+impl<const USE_ADVICE: bool> MulmodExt for MulmodImpl<USE_ADVICE> {
     fn execute<O: IOOracle>(
         a: &mut U256,
         b: &mut U256,

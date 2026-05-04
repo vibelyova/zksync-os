@@ -388,6 +388,8 @@ pub trait SystemFunctions<R: Resources> {
 pub trait SystemFunctionsExt<R: Resources> {
     type Secp256k1ECRecover: SystemFunctionExt<R, Secp256k1ECRecoverErrors>;
     type ModExp: SystemFunctionExt<R, ModExpErrors>;
+    type DivRem: DivRemExt;
+    type Mulmod: MulmodExt;
 
     fn secp256k1_ec_recover<
         O: IOOracle,
@@ -421,15 +423,12 @@ pub trait SystemFunctionsExt<R: Resources> {
         Self::ModExp::execute(input, output, resources, oracle, logger, allocator)
     }
 
-    type U256DivRem: U256DivRemExt;
-    type U256Mulmod: U256MulmodExt;
-
     fn u256_div_rem<O: IOOracle>(
         dividend_or_quotient: &mut u256::U256,
         divisor_or_remainder: &mut u256::U256,
         oracle: &mut O,
     ) {
-        Self::U256DivRem::execute(dividend_or_quotient, divisor_or_remainder, oracle)
+        Self::DivRem::execute(dividend_or_quotient, divisor_or_remainder, oracle)
     }
 
     fn u256_mulmod<O: IOOracle>(
@@ -438,11 +437,11 @@ pub trait SystemFunctionsExt<R: Resources> {
         modulus_or_result: &mut u256::U256,
         oracle: &mut O,
     ) {
-        Self::U256Mulmod::execute(a, b, modulus_or_result, oracle)
+        Self::Mulmod::execute(a, b, modulus_or_result, oracle)
     }
 }
 
-pub trait U256DivRemExt {
+pub trait DivRemExt {
     fn execute<O: IOOracle>(
         dividend_or_quotient: &mut u256::U256,
         divisor_or_remainder: &mut u256::U256,
@@ -450,7 +449,7 @@ pub trait U256DivRemExt {
     );
 }
 
-pub trait U256MulmodExt {
+pub trait MulmodExt {
     fn execute<O: IOOracle>(
         a: &mut u256::U256,
         b: &mut u256::U256,

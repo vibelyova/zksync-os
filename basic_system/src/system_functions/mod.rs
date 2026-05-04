@@ -65,6 +65,6 @@ impl<R: Resources, const USE_ADVICE: bool> SystemFunctionsExt<R>
 {
     type Secp256k1ECRecover = ecrecover::EcRecoverImpl<USE_ADVICE>;
     type ModExp = modexp::ModExpImpl<USE_ADVICE>;
-    type U256DivRem = u256_advice::U256DivRemImpl<USE_ADVICE>;
-    type U256Mulmod = u256_advice::U256MulmodImpl<USE_ADVICE>;
+    type DivRem = u256_advice::DivRemImpl<USE_ADVICE>;
+    type Mulmod = u256_advice::MulmodImpl<USE_ADVICE>;
 }
