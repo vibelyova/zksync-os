@@ -205,6 +205,9 @@ impl OracleQueryProcessor for ArithmeticQuery {
             let mut it = query.into_iter();
             let arg_ptr = it.next().expect("expected params pointer");
             assert!(it.next().is_none(), "expected exactly 1 pointer");
+            assert!(arg_ptr.is_multiple_of(4));
+            const { assert!(core::mem::align_of::<U256DivRemAdviceParams>() <= 4) }
+            const { assert!(core::mem::size_of::<U256DivRemAdviceParams>().is_multiple_of(4)) }
             let params: U256DivRemAdviceParams =
                 unsafe { read_struct(memory, arg_ptr as u32) }.unwrap();
             let dividend = read_u256_from_guest(memory, params.dividend_ptr);
@@ -216,6 +219,9 @@ impl OracleQueryProcessor for ArithmeticQuery {
             let mut it = query.into_iter();
             let arg_ptr = it.next().expect("expected params pointer");
             assert!(it.next().is_none(), "expected exactly 1 pointer");
+            assert!(arg_ptr.is_multiple_of(4));
+            const { assert!(core::mem::align_of::<U256MulmodAdviceParams>() <= 4) }
+            const { assert!(core::mem::size_of::<U256MulmodAdviceParams>().is_multiple_of(4)) }
             let params: U256MulmodAdviceParams =
                 unsafe { read_struct(memory, arg_ptr as u32) }.unwrap();
             let a = read_u256_from_guest(memory, params.a_ptr);
